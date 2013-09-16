@@ -1,0 +1,23 @@
+{
+	"name": "ncache",
+	"version": "0.0.1",
+	"author": "Lev Rogozhin <lev@rogozhin.pro>",
+	"description": "Lightweight node.js module for cache data in memory.",
+	"contributors": [
+		{
+			"name": "Lev Rogozhin",
+			"email": "lev@rogozhin.pro"
+		}
+	],
+	"keywords": [
+		"cache"
+	],
+	"license": "Alfa.HUJ",
+	"repository": {
+		"type": "git",
+		"url": "git@dev.alfabank.ru:ncache"
+	},
+	"engines": {
+		"node": ">=0.10"
+	}
+}
