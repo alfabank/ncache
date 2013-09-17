@@ -36,7 +36,8 @@ Cache.prototype.get = function (key) {
 	}
 };
 Cache.prototype.set = function (key, value, livetime) {
-	var cacheDefaultTime = this._settings.cacheDefaultTime,
+	var self = this,
+		cacheDefaultTime = this._settings.cacheDefaultTime,
 		data = [];
 	if (typeof key == 'object') {
 		data.push(key);
@@ -48,8 +49,8 @@ Cache.prototype.set = function (key, value, livetime) {
 		})
 	}
 	data.forEach(function(d){
-		this.cache[d.key] = d.value;
-		this.cacheTime[d.key] = new Date().valueOf() + (d.livetime>>0 || cacheDefaultTime);
+		self.cache[d.key] = d.value;
+		self.cacheTime[d.key] = new Date().valueOf() + (d.livetime>>0 || cacheDefaultTime);
 	});
 };
 Cache.prototype._clearCheck = function () {
