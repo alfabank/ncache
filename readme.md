@@ -1,14 +1,14 @@
 # NCache
 
-**Version 0.0.1**
+**Version 0.1.0**
 
 ## Purpose
-Lightweight node.js module for cache data in memory.
+Lightweight node.js and browser module for cache data in memory.
 
 ## Features
 - lightweight script;
 - easy to use;
-- no requires except node.js.
+- no requires except node.js or browser.
 
 ## Installation
 Via [npm](http://github.com/isaacs/npm):
@@ -42,6 +42,11 @@ In this moment this settings exists:
 
 ### .md5(string)
 Return md5 hash of given string. In [0-9a-h] format.
+Internal function but can be useful in external cases.
+Inplemented only under node.js. Throw an error in browser.
+
+### .hash(string)
+Return hash of given string. In Int32 format.
 Internal function but can be useful in external cases.
 
 ### .check(key)
