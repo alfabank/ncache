@@ -1,6 +1,6 @@
 {
 	"name": "ncache",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"author": "Lev Rogozhin <lev@rogozhin.pro>",
 	"description": "Lightweight node.js and browser module for cache data in memory.",
 	"contributors": [
