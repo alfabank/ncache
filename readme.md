@@ -1,6 +1,6 @@
 # NCache
 
-**Version 1.2.0**
+**Version 1.2.1**
 
 ## Purpose
 Lightweight node.js and browser module for cache data in memory.

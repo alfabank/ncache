@@ -1,0 +1,12 @@
+{
+	"bitwise": false,
+	"curly": true,
+	"eqeqeq": true,
+	"forin": true,
+	"freeze": true,
+	"esversion": 6,
+	"node": true,
+	"undef": true,
+	"eqnull": false,
+	"laxcomma": false
+}

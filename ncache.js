@@ -1,140 +1,134 @@
-((top) => {
-	const isBrowser = (typeof top.exports == 'undefined');
+const isBrowser = (typeof windows !== 'undefined');
 
-	class Cache {
-		constructor(params = {}) {
-			if (!isBrowser) {
-				this.crypto = require('crypto');
-			}
-
-			this.cache = {};
-			this.cacheTime = {};
-
-			this.settings = Object.assign({
-				cacheDefaultTime: 5 * 60 * 1000,
-				cacheClearProb: 0.01
-			}, params);
+class Cache {
+	constructor(params = {}) {
+		if (!isBrowser) {
+			this.crypto = require('crypto');
 		}
 
-		settings(key, value) {
-			if (typeof key === 'object') {
-				Object.assign(this._settings, key);
-				return true;
-			}
+		this.cache = {};
+		this.cacheTime = {};
 
-			if (!value) {
-				return this._settings[key];
-			}
+		this._settings = Object.assign({
+			cacheDefaultTime: 5 * 60 * 1000,
+			cacheClearProb: 0.01
+		}, params);
+	}
 
-			this._settings[key] = value;
+	settings(key, value) {
+		if (typeof key === 'object') {
+			Object.assign(this._settings, key);
 			return true;
 		}
 
-		md5(str) {
-			if (isBrowser) {
-				throw new Error('Not implemented');
-			}
-			return this.crypto.createHash('md5').update(str).digest("hex");
+		if (!value) {
+			return this._settings[key];
 		}
 
-		hash(_str) {
-			let hash = 0;
-			const str = _str.toString();
+		this._settings[key] = value;
+		return true;
+	}
 
-			if (str.length === 0) {
-				return hash;
-			}
+	md5(str) {
+		if (isBrowser) {
+			throw new Error('Not implemented');
+		}
+		return this.crypto.createHash('md5').update(str).digest("hex");
+	}
 
-			for (let i = 0; i < str.length; i++) {
-				const chr = str.charCodeAt(i);
-				hash = ((hash << 5) - hash) + chr;
-				hash |= 0;
-			}
+	hash(_str) {
+		let hash = 0;
+		const str = _str.toString();
 
+		if (str.length === 0) {
 			return hash;
 		}
 
-		check(key) {
-			return this.cacheTime[key] &&
-				this.cacheTime[key] >= new Date().valueOf() &&
-				this.cache[key];
+		for (let i = 0; i < str.length; i++) {
+			const chr = str.charCodeAt(i);
+			hash = ((hash << 5) - hash) + chr;
+			hash |= 0;
 		}
 
-		get(key) {
-			if (this.check(key)) {
-				return this.cache[key];
-			} else {
-				this._clearCheck();
-				return null;
-			}
+		return hash;
+	}
+
+	check(key) {
+		return this.cacheTime[key] &&
+			this.cacheTime[key] >= new Date().valueOf() &&
+			this.cache[key];
+	}
+
+	get(key) {
+		if (this.check(key)) {
+			return this.cache[key];
+		} else {
+			this._clearCheck();
+			return null;
+		}
+	}
+
+	set(key, value, livetime) {
+		const cacheDefaultTime = this._settings.cacheDefaultTime;
+		const data = [];
+
+		if (typeof key === 'object') {
+			data.push(key);
+		} else {
+			data.push({ key, value, livetime });
 		}
 
-		set(key, value, livetime) {
-			const cacheDefaultTime = this._settings.cacheDefaultTime;
-			const data = [];
+		data.forEach((d) => {
+			this.cache[d.key] = d.value;
+			this.cacheTime[d.key] = new Date().valueOf() + (d.livetime >> 0 || cacheDefaultTime);
+		});
+	}
 
-			if (typeof key === 'object') {
-				data.push(key);
-			} else {
-				data.push({ key, value, livetime });
-			}
+	remove(key) {
+		if (key.endsWith('*')) {
+			const start = key.replace(/\*$/, '');
 
-			data.forEach((d) => {
-				this.cache[d.key] = d.value;
-				this.cacheTime[d.key] = new Date().valueOf() + (d.livetime >> 0 || cacheDefaultTime);
-			});
-		}
-
-		remove(key) {
-			if (key.endsWith('*')) {
-				const start = key.replace(/\*$/, '');
-
-				Object.keys(this.cacheTime)
-					.filter(key => key.startsWith(start))
-					.forEach(key => this.remove(key));
-
-				this.gc();
-			} else {
-				delete(this.cacheTime[key]);
-				delete(this.cache[key]);
-			}
-		}
-
-		_clearCheck() {
-			if (Math.random() < this._settings.cacheClearProb) {
-				this.clean();
-			}
-		}
-
-		clean() {
-			Object.keys(this.cacheTime).forEach((key) => {
-				if (this.cacheTime[key] < new Date().valueOf()) {
-					this.remove(key);
-				}
-			});
+			Object.keys(this.cacheTime)
+				.filter(key => key.startsWith(start))
+				.forEach(key => this.remove(key));
 
 			this.gc();
+		} else {
+			delete(this.cacheTime[key]);
+			delete(this.cache[key]);
 		}
+	}
 
-		clear() {
-			Object.keys(this.cacheTime).forEach((key) => {
+	_clearCheck() {
+		if (Math.random() < this._settings.cacheClearProb) {
+			this.clean();
+		}
+	}
+
+	clean() {
+		Object.keys(this.cacheTime).forEach((key) => {
+			if (this.cacheTime[key] < new Date().valueOf()) {
 				this.remove(key);
-			});
-
-			this.gc();
-		}
-
-		gc() {
-			if (typeof global !== 'undefined' && typeof global.gc === 'function') {
-				// perform GC if we can
-				global.gc();
 			}
-		}
+		});
+
+		this.gc();
 	}
 
-	if (!isBrowser) {
-		top.exports = new Cache();
-	} else {
-		export default new Cache();
+	clear() {
+		Object.keys(this.cacheTime).forEach((key) => {
+			this.remove(key);
+		});
+
+		this.gc();
 	}
-})(typeof module !== 'undefined' ? module : window);
+
+	gc() {
+		if (typeof global !== 'undefined' && typeof global.gc === 'function') {
+			// perform GC if we can
+			global.gc();
+		}
+	}
+}
+
+module.exports = new Cache();
