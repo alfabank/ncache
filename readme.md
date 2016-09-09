@@ -1,6 +1,6 @@
 # NCache
 
-**Version 0.1.0**
+**Version 1.2.0**
 
 ## Purpose
 Lightweight node.js and browser module for cache data in memory.
@@ -17,13 +17,13 @@ Via [npm](http://github.com/isaacs/npm):
 ```
 Manually:
 ```
-git clone git@dev.alfabank.ru:ncache
+git clone git@github.com:alfabank/ncache.git
 // var cache = require('./ncache');
 ```
 
 ## Example
 ```javascript
-var var cache = require('./ncache');
+const cache = require('./ncache');
 
 cache.set('foo', 'bar', 100500);
 console.log(cache.get('foo'));
@@ -55,6 +55,9 @@ Meant the true only if value by key exists an not become rotten.
 
 ### .get(key)
 Return value by key. If absent or rotten returns `null`.
+
+### remove(key)
+Remove value from storage by given key. If end with '*' will remove all key-values starts with key.
 
 ### .set(key, value, lifetime) | .set(data)
 Function for cache values.
